@@ -1,0 +1,8 @@
+numpy==1.20.3
+pandas==1.3.3
+toad
+scorecardpy
+scikit-learn==1.2.1
+sklearn-pandas==2.2.0
+sklearn2pmml==0.90.4
+pypmml==0.9.17

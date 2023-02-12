@@ -1,40 +1,22 @@
-# 评分卡模型转PMML部署
+import warnings
+import numpy as np
+import pandas as pd
+import toad
+import scorecardpy as sc
+from sklearn.linear_model import LogisticRegression
 
-+ 评分卡模型转换为PMML文件进行部署
-
-## 简介
-
-`scorecard2pmml` 提供 `card2pmml` 方法支持用户将 `toad`, `scorecardpy` 以及 离线的评分卡文件 转换为 `PMML` 文件进行评分卡模型的部署
-
-## 项目结果
-
-```base
-itlubber@itlubber:~/workspace/scorecard2pmml$ tree .
-.
-├── LICENSE                     # 项目开源许可n证书
-├── README.md                   # 说明文档
-├── requirements.txt            # 项目依赖包
-├── scorecard2pmml.py           # 评分卡模型转PMML文件功能实现
-└── test.py                     # 测试脚本
-
-0 directories, 5 files
-```
+from scorecard2pmml import card2bins, card2pmml
 
 
-## 食用方法
+warnings.filterwarnings("ignore")
 
-0. 样例数据
 
-```python
 target = "creditability"
 data = sc.germancredit()
 data[target] = data[target].map({"good": 0, "bad": 1})
-```
 
-1. 生成评分卡变量分箱表
 
-```python
-# 使用 toad 生成的评分卡变量分箱信息
+# 使用 toad 生成的评分卡模型转PMML文件
 data_selected = toad.selection.select(data, target=target, empty=0.5, iv=0.05, corr=0.7)
 c = toad.transform.Combiner()
 c.fit(data_selected, y=target, method='chi', min_samples=0.05)
@@ -44,10 +26,12 @@ final_data = toad.selection.stepwise(data_woe,target=target, estimator='ols', di
 card = toad.ScoreCard(combiner=c, transer=transer)
 card.fit(final_data.drop(columns=[target]), final_data[target])
 
-# scorecard_feature_bins = card.export(to_frame=True)
-scorecard_feature_bins = card2bins(card)
+# toad_feature_bins = card.export(to_frame=True)
 
+scorecard_feature_bins = card2bins(card)
 print(scorecard_feature_bins)
+
+card2pmml(scorecard_feature_bins, pmml="toad_scorecard.pmml")
 
 
 # 使用 scorecardpy 生成的评分卡模型转PMML文件
@@ -59,31 +43,16 @@ lr.fit(data_woe.drop(columns=target), data_woe[target])
 card = sc.scorecard(bins, lr, list(data_woe.drop(columns=target).columns))
 
 # scorecardpy_feature_bins = pd.concat({k: v for k, v in card.items() if k != "basepoints"}.values())
-scorecard_feature_bins = card2bins(card)
 
+scorecard_feature_bins = card2bins(card)
 print(scorecard_feature_bins)
+
+card2pmml(scorecard_feature_bins, pmml="scorecardpy_scorecard.pmml")
 
 
 # 读取excel文件转PMML
 scorecard_feature_bins.to_excel("scorecard.xlsx", sheet_name="card", index=False)
 
+
 scorecard_feature_bins = pd.read_excel("scorecard.xlsx", sheet_name="card")
-print(scorecard_feature_bins)
-```
-
-2. 转换 `PMML` 文件
-
-```python
-card2pmml(scorecard_feature_bins, pmml="scorecard.pmml")
-```
-
-3. 结果验证
-
-```python
-from pypmml import Model
-
-
-model = Model.fromFile("scorecard.pmml")
-
-data["score"] = model.predict(data[model.inputNames]).values
-```
+card2pmml(scorecard_feature_bins, pmml="offline_scorecard.pmml")
