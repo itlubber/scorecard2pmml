@@ -1,6 +1,6 @@
 # 评分卡模型转PMML部署
 
-+ 评分卡模型转换为PMML文件进行部署
+![图片](https://itlubber.art/upload/2023/02/%E5%9B%BE%E7%89%87.png)
 
 ## 简介
 
@@ -11,7 +11,7 @@
 ```base
 itlubber@itlubber:~/workspace/scorecard2pmml$ tree .
 .
-├── LICENSE                     # 项目开源许可n证书
+├── LICENSE                     # 项目开源许可证书
 ├── README.md                   # 说明文档
 ├── requirements.txt            # 项目依赖包
 ├── scorecard2pmml.py           # 评分卡模型转PMML文件功能实现
