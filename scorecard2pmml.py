@@ -22,11 +22,11 @@ def card2bins(card):
 
 
 def extract_elements(bin_var):
-    pattern = re.compile('^\[(-?\d+|\-inf)(,|\s~\s)(-?\d+|inf)\)$')
+    pattern = re.compile(r'^(\[|\()(-inf|[-+]?\d+(\.\d+)?)(\s*,\s*|\s*~\s*)(inf|[-+]?\d+(\.\d+)?)?(\]|\))$')
     match = pattern.match(bin_var)
 
     if match:
-        return match.group(1), match.group(3)
+        return match.group(2), match.group(5)
     else:
         return None, None
 
