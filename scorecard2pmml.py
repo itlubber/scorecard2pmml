@@ -87,15 +87,21 @@ def card2pmml(scorecard_feature_bins: pd.DataFrame, pmml: str="scorecard.pmml", 
             # samples[var] = np.random.random(n_samples) * 100
         else:
             mapping = {}
+            default_value = 0.0
+            
             for _, row in bin_vars.iterrows():
                 sep = "%,%" if "%,%" in row[headers[1]] else ","
                 bin_var = row[headers[1]].split(sep)
+                
                 for _bin in bin_var:
-                    mapping[_bin] = row[headers[2]]
+                    if _bin == 'none':
+                        default_value = float(row[headers[2]])
+                    else:
+                        mapping[_bin] = float(row[headers[2]])
 
             mapper.append((
                 [var],
-                LookupTransformer(mapping=mapping, default_value=0.0),
+                LookupTransformer(mapping=mapping, default_value=default_value),
                 # {'alias': var}
             ))
             # samples[var] = [list(mapping.keys())[i] for i in np.random.randint(0, len(mapping), n_samples)]
