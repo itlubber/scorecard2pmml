@@ -85,7 +85,7 @@ scorecard_feature_bins = card2bins(card)
 print(scorecard_feature_bins)
 
 
-# 读取excel文件转PMML
+# 读取excel文件转PMML: 必须包含三列:["变量名", "分箱", "对应分数"], 保证顺序一致
 scorecard_feature_bins.to_excel("scorecard.xlsx", sheet_name="card", index=False)
 
 scorecard_feature_bins = pd.read_excel("scorecard.xlsx", sheet_name="card")
